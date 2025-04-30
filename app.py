@@ -116,7 +116,7 @@ if uploaded_file:
 
     with col2:
         st.subheader("🧠 Explanation")
-        with st.spinner("Sending to Gemini for explanation with full context..."):
+        with st.spinner("Thinking ..."):
             explanation = explain_slide_threaded(image)
         st.markdown(
             f"""
