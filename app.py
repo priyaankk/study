@@ -15,8 +15,10 @@ def convert_pptx_to_pdf_bytes(pptx_bytes):
     ppt_stream = BytesIO(pptx_bytes)
     pdf_stream = BytesIO()
     with slides.Presentation(ppt_stream) as presentation:
+        ppt_stream.seek(0)
         presentation.save(pdf_stream, slides.export.SaveFormat.PDF)
-    return pdf_stream.getvalue()
+        pdf_stream.seek(0)
+        return pdf_stream.read()
     
 # Load API key
 load_dotenv()
