@@ -9,26 +9,7 @@ from io import BytesIO
 # from pdf2image import convert_from_bytes
 from streamlit_javascript import st_javascript
 import fitz
-import aspose.slides as slides
-# from streamlit.runtime.scriptrunner import rerun
-# from streamlit.runtime.scriptrunner import RerunException
-# from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 
-def force_rerun():
-    ctx = get_script_run_ctx()
-    if ctx is None:
-        return
-    raise RerunException()
-
-def convert_pptx_to_pdf_bytes(pptx_bytes):
-    ppt_stream = BytesIO(pptx_bytes)
-    pdf_stream = BytesIO()
-    with slides.Presentation(ppt_stream) as presentation:
-        ppt_stream.seek(0)
-        presentation.save(pdf_stream, slides.export.SaveFormat.PDF)
-        pdf_stream.seek(0)
-        return pdf_stream.read()
-    
 # Load API key
 load_dotenv()
 GEMINI_API_KEY = "AIzaSyCjznKUifMfOL3WT26lCIBtKbMemTRIHa8"  # Replace with your actual API key
@@ -50,7 +31,7 @@ new Promise((resolve) => {
 """)
 
 # Upload PDF
-uploaded_file = st.file_uploader("Upload your PDF or PowerPoint slides", type=["pdf", "pptx"])
+uploaded_file = st.file_uploader("Upload your PDF notes/slides", type=["pdf"])
 
 # Session state init
 if "chat_history" not in st.session_state:
@@ -105,11 +86,8 @@ def explain_slide_threaded(image_pil):
 
 # Once uploaded
 if uploaded_file:
-    st.success("Slides uploaded successfully!")
+    st.success("PDF uploaded successfully!")
     pdf_bytes = uploaded_file.read()
-    if uploaded_file.name.lower().endswith(".pptx"):
-        # st.info("Converting PowerPoint to PDF...")
-        pdf_bytes = convert_pptx_to_pdf_bytes(pdf_bytes)
     reader = PdfReader(BytesIO(pdf_bytes))
     num_pages = len(reader.pages)
 
@@ -126,28 +104,19 @@ if uploaded_file:
         options=page_options,
         index=st.session_state.current_page - 1
     )
-    # selected_page = int(selected_option.split()[-1])
-    # st.session_state.current_page = selected_page
-    # selected_page = int(selected_option.split()[-1])
-    # if selected_page != st.session_state.current_page:
-    #     st.session_state.current_page = selected_page
-    #     force_rerun()
-
     selected_page = int(selected_option.split()[-1])
-    st.session_state.pending_page = selected_page
+    st.session_state.current_page = selected_page
+
     # Show PDF and explanation
     col1, col2 = st.columns(2)
     with col1:
         st.subheader(f"📄 Slide {selected_page}")
-        # Sync the selected page if changed
-        if "pending_page" in st.session_state and st.session_state.pending_page != st.session_state.current_page:
-            st.session_state.current_page = st.session_state.pending_page
         image = pdf_page_to_image(pdf_bytes, selected_page - 1)
         st.image(image, use_container_width=True)
 
     with col2:
         st.subheader("🧠 Explanation")
-        with st.spinner("Thinking ..."):
+        with st.spinner("Sending to Gemini for explanation with full context..."):
             explanation = explain_slide_threaded(image)
         st.markdown(
             f"""
