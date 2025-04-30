@@ -128,14 +128,20 @@ if uploaded_file:
     )
     # selected_page = int(selected_option.split()[-1])
     # st.session_state.current_page = selected_page
+    # selected_page = int(selected_option.split()[-1])
+    # if selected_page != st.session_state.current_page:
+    #     st.session_state.current_page = selected_page
+    #     force_rerun()
+
     selected_page = int(selected_option.split()[-1])
-    if selected_page != st.session_state.current_page:
-        st.session_state.current_page = selected_page
-        force_rerun()
+    st.session_state.pending_page = selected_page
     # Show PDF and explanation
     col1, col2 = st.columns(2)
     with col1:
         st.subheader(f"📄 Slide {selected_page}")
+        # Sync the selected page if changed
+        if "pending_page" in st.session_state and st.session_state.pending_page != st.session_state.current_page:
+            st.session_state.current_page = st.session_state.pending_page
         image = pdf_page_to_image(pdf_bytes, selected_page - 1)
         st.image(image, use_container_width=True)
 
