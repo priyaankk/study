@@ -117,8 +117,12 @@ if uploaded_file:
         options=page_options,
         index=st.session_state.current_page - 1
     )
+    # selected_page = int(selected_option.split()[-1])
+    # st.session_state.current_page = selected_page
     selected_page = int(selected_option.split()[-1])
-    st.session_state.current_page = selected_page
+    if selected_page != st.session_state.current_page:
+        st.session_state.current_page = selected_page
+        st.experimental_rerun()
 
     # Show PDF and explanation
     col1, col2 = st.columns(2)
