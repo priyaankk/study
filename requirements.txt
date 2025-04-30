@@ -5,3 +5,4 @@ pillow
 python-dotenv
 streamlit-javascript
 PyMuPDF
+aspose.slides
