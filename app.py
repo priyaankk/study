@@ -9,7 +9,15 @@ from io import BytesIO
 # from pdf2image import convert_from_bytes
 from streamlit_javascript import st_javascript
 import fitz
+import aspose.slides as slides
 
+def convert_pptx_to_pdf_bytes(pptx_bytes):
+    ppt_stream = BytesIO(pptx_bytes)
+    pdf_stream = BytesIO()
+    with slides.Presentation(ppt_stream) as presentation:
+        presentation.save(pdf_stream, slides.export.SaveFormat.PDF)
+    return pdf_stream.getvalue()
+    
 # Load API key
 load_dotenv()
 GEMINI_API_KEY = "AIzaSyCjznKUifMfOL3WT26lCIBtKbMemTRIHa8"  # Replace with your actual API key
@@ -31,7 +39,7 @@ new Promise((resolve) => {
 """)
 
 # Upload PDF
-uploaded_file = st.file_uploader("Upload your PDF notes/slides", type=["pdf"])
+uploaded_file = st.file_uploader("Upload your PDF or PowerPoint slides", type=["pdf", "pptx"])
 
 # Session state init
 if "chat_history" not in st.session_state:
@@ -86,8 +94,11 @@ def explain_slide_threaded(image_pil):
 
 # Once uploaded
 if uploaded_file:
-    st.success("PDF uploaded successfully!")
+    st.success("Slides uploaded successfully!")
     pdf_bytes = uploaded_file.read()
+    if uploaded_file.name.lower().endswith(".pptx"):
+        # st.info("Converting PowerPoint to PDF...")
+        pdf_bytes = convert_pptx_to_pdf_bytes(pdf_bytes)
     reader = PdfReader(BytesIO(pdf_bytes))
     num_pages = len(reader.pages)
 
