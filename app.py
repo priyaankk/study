@@ -11,11 +11,14 @@ from streamlit_javascript import st_javascript
 import fitz
 import aspose.slides as slides
 # from streamlit.runtime.scriptrunner import rerun
-import sys
+from streamlit.runtime.scriptrunner import RerunException
+from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 
-def safe_rerun():
-    raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
-
+def force_rerun():
+    ctx = get_script_run_ctx()
+    if ctx is None:
+        return
+    raise RerunException()
 
 def convert_pptx_to_pdf_bytes(pptx_bytes):
     ppt_stream = BytesIO(pptx_bytes)
@@ -128,7 +131,7 @@ if uploaded_file:
     selected_page = int(selected_option.split()[-1])
     if selected_page != st.session_state.current_page:
         st.session_state.current_page = selected_page
-        safe_rerun()
+        force_rerun()
     # Show PDF and explanation
     col1, col2 = st.columns(2)
     with col1:
