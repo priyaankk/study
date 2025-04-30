@@ -6,7 +6,7 @@ import base64
 import requests
 from PIL import Image
 from io import BytesIO
-from pdf2image import convert_from_bytes
+# from pdf2image import convert_from_bytes
 from streamlit_javascript import st_javascript
 import fitz
 
