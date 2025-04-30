@@ -11,8 +11,8 @@ from streamlit_javascript import st_javascript
 import fitz
 import aspose.slides as slides
 # from streamlit.runtime.scriptrunner import rerun
-from streamlit.runtime.scriptrunner import RerunException
-from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+# from streamlit.runtime.scriptrunner import RerunException
+# from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 
 def force_rerun():
     ctx = get_script_run_ctx()
